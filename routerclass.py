@@ -59,6 +59,7 @@ class Router:
     def trace(self, message):
         message["hops"].append(self.ip)
         if self.ip == message["destination"]:
+            print("achoo")
             new_message = {
                 "type": "data",
                 "destination": message["source"],
@@ -73,10 +74,14 @@ class Router:
         min_ = float("inf")
         for u in self.routes:
             for v in self.routes[u]:
-                if v == message["destination"] and int(self.routes[u][v] + self.table[u]) <= min_:
-                    print(v, u, message["destination"] )
+                if v == message["destination"] and int(self.routes[u][v]) + int(self.table[u])  <= min_ and self.routes[u][v]:
                     vertex = u
+                    min_ = int(self.routes[u][v]) + int(self.table[u])
 
+        if vertex == self.ip:
+            vertex = message["destination"]
+
+        print("quero mandar pra vc:", vertex)
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.sendto(json.dumps(message).encode(), (vertex, self.port))
         client.close()
