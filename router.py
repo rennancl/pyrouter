@@ -13,12 +13,12 @@ def server(router, ip, port):
     while True:
         data, address = server.recvfrom(4096)
         message = json.loads(data.decode())
-        pprint(message)
-        # if message["type"] == "update":
-        #     router.update_routes(message)
 
-        # if message["type"] == "trace":
-        #     router.trace(message)
+        if message["type"] == "update":
+            router.update_routes(message)
+
+        if message["type"] == "trace":
+            router.trace(message)
 
         # router.
         # server.sendto("Seja bem vindo !".encode(), address)
@@ -66,7 +66,6 @@ def main():
         else:
             cmd = input()
         cmds = cmd.split()
-        print(cmd)
         if cmds[0] == "add":
             ip = cmds[1]
             weight = cmds[2]
@@ -77,6 +76,11 @@ def main():
         elif cmds[0] == "trace":
             ip = cmds[1]
             router.trace(ip)
+        elif cmds[0] == "print":
+            pprint(router.table)
+        elif cmds[0] == "printr":
+            pprint(router.routes)
+
         else:
             print("Comando não reconhecido")
 
