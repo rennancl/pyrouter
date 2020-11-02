@@ -13,6 +13,8 @@ class Router:
 
     def del_address(self, ip):
         del self.table[ip]
+        del self.routes[ip]
+        self.update_table()
 
     def update(self):
         message = {}
@@ -26,7 +28,8 @@ class Router:
             client.close()
 
     def update_routes(self, message):
-        self.routes[message["source"]] = message["distances"]
+        if message["source"] in self.table:
+            self.routes[message["source"]] = message["distances"]
         self.update_table()
 
     def update_table(self):
@@ -59,7 +62,6 @@ class Router:
     def trace(self, message):
         message["hops"].append(self.ip)
         if self.ip == message["destination"]:
-            print("achoo")
             new_message = {
                 "type": "data",
                 "destination": message["source"],
@@ -81,36 +83,6 @@ class Router:
         if vertex == self.ip:
             vertex = message["destination"]
 
-        print("quero mandar pra vc:", vertex)
         client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         client.sendto(json.dumps(message).encode(), (vertex, self.port))
         client.close()
-
-
-        # vertices = set()
-        # for vertex in self.routes:
-        #     vertices.add(vertex)
-        #     for neighbor in self.routes[vertex]:
-        #         vertices.add(neighbor)
-
-        # vertices = list(vertices)
-        # dist = {vertex: float("inf") for vertex in vertices}
-        # prev = {vertex: 0 for vertex in vertices}
-        # dist[self.ip] = 0
-
-        # while vertices:
-        #     min_ = float("inf")
-        #     for key in dist:
-        #         if dist[key] <= min_ and key in vertices:
-        #             min_ = dist[key]
-        #             u = key
-        #     vertices = [vertex for vertex in vertices if vertex != u]
-        #     if u in self.routes:
-        #         print(u, self.routes)
-        #         for neighbor in self.routes[u]:
-        #             value = dist[u] + int(self.routes[u][neighbor])
-        #             if value < dist[neighbor]:
-        #                 dist[neighbor] = value
-        #                 prev[neighbor] = u
-
-        # return dist, prev

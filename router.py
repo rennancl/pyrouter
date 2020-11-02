@@ -21,7 +21,7 @@ def server(router, ip, port):
             router.trace(message)
 
         if message["type"] == "data":
-            pprint(message)
+            print(json.dumps(json.loads(message["payload"]), indent=4))
 
 def update_router(router, period):
     while True:
@@ -29,7 +29,7 @@ def update_router(router, period):
         router.update()
 
 def main():
-    connect_ip = sys.argv[1] #'127.0.1.8'
+    connect_ip = sys.argv[1]
     period = int(sys.argv[2])
     startup = []
     if len(sys.argv) > 3:
@@ -39,14 +39,10 @@ def main():
     port = 55151
     router = Router(connect_ip, port)
 
-
-    # client_thread = threading.Thread(target=client_init, args=(connect_ip, port))
     server_thread = threading.Thread(target=server, args=(router, connect_ip, port))
     update_thread = threading.Thread(target=update_router, args=(router, period))
     update_thread.start()
     server_thread.start()
-    # client_thread.start()
-
 
     while True:
         if startup:
@@ -74,15 +70,11 @@ def main():
             pprint(router.table)
         elif cmds[0] == "printr":
             pprint(router.routes)
-
         else:
             print("Comando não reconhecido")
 
-
-    # client_thread.join()
     server_thread.join()
     update_thread.join()
-
 
 if __name__ == "__main__":
     main()
