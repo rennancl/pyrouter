@@ -65,18 +65,30 @@ class Router:
 
     def trace(self, message):
         dist, prev = self.get_routes()
-        # usa o prev pra descobrir a rota la 
+        print(prev)
+        message["hops"].append(self.ip)
+        if self.ip == message["destination"]:
+            new_message = {
+                "type": "data",
+                "destination": message["source"],
+                "source": self.ip,
+                "payload": json.dumps(message)
+            }
+            client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            client.sendto(json.dumps(new_message).encode(), (new_message["destination"], self.port))
+            client.close()
+            return
 
-        #se for eu, eu retorno pro source a mensagem como data
-        #senao, eu calculo a menor rota pro objetivo que eles querem
-        #get_routes
-        #e mando pra pessoa que ta nesse caminho ai pra chegar
-        pass
+        vertex = message["destination"]
+        while True:
+            prev_vertex = prev[vertex]
+            if self.ip == prev_vertex:
+                break
+            vertex = prev_vertex
 
-        # nao sei se devo mandar um update assim que faco isso
-        # ou depois na hora que da o tempo do periodo ele atuliza
-
-        # print("Atualizando")
+        client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        client.sendto(json.dumps(message).encode(), (vertex, self.port))
+        client.close()
 
 # A -> B 10
 # A -> C 1

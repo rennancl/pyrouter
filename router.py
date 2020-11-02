@@ -20,20 +20,8 @@ def server(router, ip, port):
         if message["type"] == "trace":
             router.trace(message)
 
-        # router.
-        # server.sendto("Seja bem vindo !".encode(), address)
-
-# def client_init(ip, port):
-#     message = {"type": "trace",
-#                "source": "127.0.1.1",
-#                "destination": "127.0.1.2",
-#                "hops": ["127.0.1.1", "127.0.1.5", "127.0.1.2"]}
-
-#     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#     client.sendto(json.dumps(message).encode(), (ip, port))
-#     buffer, server_address = client.recvfrom(4096)
-#     client.close()
-#     print("CLIENT", buffer)
+        if message["type"] == "data":
+            pprint(message)
 
 def update_router(router, period):
     while True:
@@ -75,7 +63,13 @@ def main():
             router.del_address(ip)
         elif cmds[0] == "trace":
             ip = cmds[1]
-            router.trace(ip)
+            message = {
+                "type": "trace",
+                "source": connect_ip,
+                "destination": ip,
+                "hops": []
+            }
+            router.trace(message)
         elif cmds[0] == "print":
             pprint(router.table)
         elif cmds[0] == "printr":
