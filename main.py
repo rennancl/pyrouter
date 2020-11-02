@@ -34,13 +34,25 @@ def client_init(ip, port):
     print("CLIENT", buffer)
 
 def main():
-    ip = '127.0.1.8'
+    connect_ip = '127.0.1.8'
     port = 55151 #int(sys.argv[1])
     server_thread = threading.Thread(target=server_init, args=(ip, port))
     client_thread = threading.Thread(target=client_init, args=(ip, port))
 
     server_thread.start()
     client_thread.start()
+
+    while True:
+        cmd = input()
+        cmds = cmd.split()
+        if cmds[0] == "add":
+            ip = cmds[1]
+            weight = cmds[2]
+        elif cmds[0] == "del":
+            ip = cmds[1]
+        else:
+            print("Comando não reconhecido")
+
 
     client_thread.join()
     server_thread.join()
